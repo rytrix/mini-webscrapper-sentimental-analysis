@@ -1,33 +1,28 @@
-from bs4 import BeautifulSoup
-import requests
+from google import genai
+from webscrape import download_website, seperate_headers_paragraphs
 import sys
 
-def download_website(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"}
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
-        return response.text
-    except requests.exceptions.RequestException as e:
-        print(f"Error downloading {url}: {e}")
-        return None
 
+def sentiment_analysis(content):
+    with open("key.private") as handle:
+        api_key = handle.read()
 
-def seperate_headers_paragraphs(website):
-    soup = BeautifulSoup(website, "html.parser")
+    client = genai.Client(api_key=api_key)
 
-    extracted_text = []
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=content,
+        config = genai.types.GenerateContentConfig(system_instruction="Perform sentimental analysis on this scraped website")
+    )
+    print(response.text)
 
-    for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "a", "li"]):
-        extracted_text.append(tag.get_text(strip=True))
-
-    return extracted_text
 
 def main(url):
     website = download_website(url)
     content = seperate_headers_paragraphs(website)
-    print(content)
+    print(str(content))
+    sentiment_analysis(str(content))
+
     
 if __name__ == "__main__":
     args = sys.argv      
