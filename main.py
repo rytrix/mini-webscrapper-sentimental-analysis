@@ -21,7 +21,7 @@ def sentiment_analysis(content):
 def main(url):
     website = download_website(url)
     content = seperate_headers_paragraphs(website)
-    print(str(content))
+    # print(str(content))
     sentiment_analysis(str(content))
 
 
