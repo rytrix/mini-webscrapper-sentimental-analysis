@@ -1,3 +1,5 @@
 beautifulsoup4
 requests
 google-genai
+browser-use
+langchain_google_genai
